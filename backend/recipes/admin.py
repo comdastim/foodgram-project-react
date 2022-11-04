@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.contrib import admin
 
-from .models import Favorite, Ingredient, Recipe, Shopping_cart, Tag
+from .models import Favorite, Ingredient, Recipe, Shopping_cart, Tag, RecipeIngredient, RecipeTag
 
 
 
@@ -18,11 +18,17 @@ class IngredientAdmin(admin.ModelAdmin):
     list_filter = ('name', ) 
     empty_value_display = '-пусто-'  
 
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+ 
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author') 
     search_fields = ('author','tag','ingredient') 
     list_filter = ('name',) 
+    inlines = [RecipeIngredientInline]
     empty_value_display = '-пусто-'  
+
 
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'recipe') 
@@ -36,7 +42,7 @@ class Shopping_cartAdmin(admin.ModelAdmin):
 
     
 admin.site.register(Favorite) 
-admin.site.register(Ingredient) 
-admin.site.register(Recipe) 
+admin.site.register(Ingredient)  
+admin.site.register(RecipeIngredient)
 admin.site.register(Shopping_cart) 
 admin.site.register(Tag) 
