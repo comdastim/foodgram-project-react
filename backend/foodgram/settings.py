@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'colorfield',
     'djoser',
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',

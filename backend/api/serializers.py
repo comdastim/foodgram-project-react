@@ -24,9 +24,7 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        if user.is_anonymous or (user == obj):
-            return False
-        return Subscription.objects.filter(
+        return user.is_authenticated and user != obj and Subscription.objects.filter(
             user=user, author=obj).exists()
 
 
@@ -159,7 +157,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     text = serializers.CharField(required=True)
     ingredients = IngredientAddSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    # tags=serializers.PrimaryKeyRelatedField(queryset-Tag.objects.all())
     cooking_time = serializers.IntegerField(required=True)
 
     class Meta:
@@ -217,10 +214,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
-    # author= serializers.StringRelatedField(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientAddSerializer(read_only=True)
-    # ingredients = serializers.SerializerMethodField(read_only=True)
     is_in_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
@@ -236,14 +231,12 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if request.user.is_authenticated:
-            return Shopping_cart.objects.filter(
+        return request.user.is_authenticated and Shopping_cart.objects.filter(
                 user=request.user, recipe=obj).exists
 
     def get_is_in_favorite(self, obj):
         request = self.context.get('request')
-        if request.user.is_authenticated:
-            return Favorite.objects.filter(
+        return request.user.is_authenticated and Favorite.objects.filter(
                 user=request.user, recipe=obj).exists
 
 

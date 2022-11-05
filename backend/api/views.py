@@ -41,62 +41,69 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeListSerializer
         return RecipeSerializer
 
+
+    @staticmethod
+    def change_object(model, recipe, request):
+        current_object = model.objects.filter(
+            user=request.user, recipe=recipe
+        )
+        if request.method == 'POST':
+            if current_object.exists():
+                return Response(
+                    {'Рецепт был добавлен ранее'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            model.objects.create(user=request.user, recipe=recipe)
+            serializer = RecipeChangeSerializer(recipe)
+            return Response(
+                        {'Рецепт добавлен'},
+                        serializer.data, status=status.HTTP_201_CREATED
+            )
+        if request.method == 'DELETE':
+            if current_object.exists():
+                current_object.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'Нельзя удалить то, что не было добавлено'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+    @staticmethod
+    def change_smth(model,serializer,recipe, request): 
+        added = model.objects.filter(user=request.user, recipe=recipe)  
+        if request.method == 'POST': 
+            if added.exists(): 
+                return Response({'Рецепт был добавлен ранее'}, 
+                    status=status.HTTP_400_BAD_REQUEST) 
+            smth_to_add=model.objects.create(user=request.user, recipe=recipe) 
+            serializer_to_use = serializer(smth_to_add, data=request.data) 
+            serializer_to_use.save() 
+            return Response({'Рецепт добавлен'}, 
+                status=status.HTTP_201_CREATED) 
+        elif request.method == 'DELETE': 
+            if added. exists (): 
+                added.delete() 
+                return Response({'Рецепт удален'}, 
+                   status=status.HTTP_204_NO_CONTENT) 
+            return Response({'Рецепт отсутствует в списке'}, 
+                 status=status.HTTP_400_BAD_REQUEST) 
+
     @action(
         methods=['POST', 'DELETE'],
         detail=True,
     )
     def change_favorite(self, request, pk):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=pk)
-        added = Favorite.objects.filter(user=user, recipe=recipe)
-        if request.method == 'POST':
-            if added.exists():
-                return Response(
-                    {'Рецепт уже добавлен в избранное'},
-                    status=status.HTTP_400_BAD_REQUEST)
-            favorite = Favorite.objects.create(user=user, recipe=recipe)
-            serializer = FavoriteSerializer(favorite, data=request.data)
-            serializer.save()
-            return Response(
-                {'Рецепт успешно добавлен в избранное'},
-                status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
-            if added. exists():
-                added.delete()
-                return Response(
-                    {'Рецепт успешно удален из избранного'},
-                    status=status.HTTP_204_NO_CONTENT)
-            return Response(
-                {'Рецепт отсутствует в избранном'},
-                status=status.HTTP_400_BAD_REQUEST)
+        recipe= get_object_or_404(Recipe, id=pk) 
+        return self.change_smth(Favorite, FavoriteSerializer,recipe=recipe, request=request)
 
     @action(
         methods=['POST', 'DELETE'],
         detail=True,
     )
     def change_shopping_cart(self, request, pk):
-        user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        added = Shopping_cart.objects.filter(user=user, recipe=recipe)
-        if request.method == 'POST':
-            if added.exists():
-                return Response({'Рецепт уже добавлен в список покупок'},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            shopping_cart = Shopping_cart.objects.create(
-                user=user, recipe=recipe)
-            serializer = Shopping_cartSerializer(
-                shopping_cart, data=request.data)
-            serializer.save()
-            return Response({'Рецепт успешно добавлен в список покупок'},
-                            status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
-            if added. exists():
-                added.delete()
-                return Response({'Рецепт успешно удален из списка покупок'},
-                                status=status.HTTP_204_NO_CONTENT)
-            return Response({'Рецепт отсутствует в списке покупок'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        return self.change_smth(Shopping_cart, Shopping_cartSerializer,recipe=recipe, request=request)
 
     @action(
         methods=['GET'],

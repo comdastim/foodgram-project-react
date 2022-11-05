@@ -1,27 +1,11 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.db import models
-
-User = get_user_model()
-
-CHOICES = (
-        ('Gray', 'Серый'),
-        ('Black', 'Чёрный'),
-        ('White', 'Белый'),
-        ('Ginger', 'Рыжий'),
-        ('Mixed', 'Смешанный'),
-        ('Yellow', 'Желтый'),
-        ('Red', 'Красный'),
-        ('Green', 'Зеленый'),
-        ('Blue', 'Голубой'),
-        ('Navy blue', 'Синий'),
-        ('Violet', 'Фиолетовый')
-    )
-
+from users.models import User
 
 class Tag(models.Model):
     name = models.CharField('Тэг', max_length=200, unique=True)
-    color = models.CharField(
-        'Цветовой HEX-код', max_length=20, unique=True, choices=CHOICES)
+    color = ColorField(default='#FF0000')
     slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:
@@ -59,7 +43,7 @@ class Recipe(models.Model):
     cooking_time = models.TimeField('Время приготовления')
 
     class Meta:
-        ordering = ['-id']
+        ordering = ('-id',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 

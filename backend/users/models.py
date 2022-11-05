@@ -15,7 +15,7 @@ class User(AbstractUser):
         max_length=50, blank=True, verbose_name='Фамилия')
 
     class Meta:
-        ordering = ['-id']
+        ordering = ('-id',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
@@ -32,7 +32,7 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        ordering = ['-id', ]
+        ordering = ('-id', )
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         constraints = [
