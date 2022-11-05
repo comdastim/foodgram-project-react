@@ -12,7 +12,7 @@ from api.serializers import ( CustomUserCreateSerializer,
                               SubscriptionListSerializer,
                               TagSerializer
                             )
-
+from .permissions import IsAuthorOrReadOnlyPermission
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404 
 from rest_framework.response import Response
@@ -24,22 +24,20 @@ from djoser.views import UserViewSet
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    # permission_classes = [AllowAny]
-    # pagination_class = None
+    pagination_class = None
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet): 
     queryset = Ingredient.objects.all() 
     serializer_class = IngredientSerializer 
-   # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-   # pagination_class = None
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet): 
     queryset = Recipe.objects.all() 
     serializer_class = RecipeSerializer 
-    # permission_classes = (IsAuthorOrReadOnlyPermission,) 
     # pagination_class = LimitOffsetPagination 
- 
+    permission_classes = (IsAuthorOrReadOnlyPermission,) 
+
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return RecipeListSerializer
@@ -49,7 +47,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action (
         methods=['POST', 'DELETE'],
         detail=True,
-        # permission_classes=[IsAuthenticated]
     )
     def change_favorite(self,request, pk):
         user=request.user
@@ -76,7 +73,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action (
         methods=['POST', 'DELETE'],
         detail=True,
-        # permission_classes=[IsAuthenticated]
     )
     def change_shopping_cart(self,request, pk):
         user=request.user
@@ -102,7 +98,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action (
         methods=['GET'],
         detail= False,
-        # permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
         user = request.user
@@ -111,7 +106,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = RecipeIngredient.objects.filter(
             recipe__shopping_cart__user=request.user).values(
                 'ingredient__name', 'ingredient__measurement_unit').annotate(amount=Sum('amount'))
-        shopping_list = set_shopping_list(user.get_full_name(), ingredients)
+        shopping_list = '\n'.join([
+            f'{ingredient["ingredient__name"]} - {ingredient["amount"]} '
+            f'{ingredient["ingredient__measurement_unit"]}'
+            for ingredient in ingredients
+        ])
         filename = f'{user.username}_shopping_list.txt'
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'
@@ -121,7 +120,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class SubscribeDetail(generics.DestroyAPIView):
     queryset = Subscription.objects.all()
     serializer_class =  SubscriptionDetailSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
 
     def delete(self, request, pk):
         user=request.user
@@ -137,13 +135,10 @@ class SubscribeDetail(generics.DestroyAPIView):
 class SubscribeList(generics.ListCreateAPIView):
     queryset = Subscription.objects.all()
     serializer_class =  SubscriptionListSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
     
 
 class CustomUserViewSet(UserViewSet):
-    # pagination_class = PageLimitPagination
     queryset = User.objects.all()
-    # permission_classes = [IsAuthenticatedOrReadOnly]
     lookup_field = 'id'
 
     def get_serializer_class(self):
@@ -153,7 +148,6 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        # permission_classes=(IsAuthenticated,),
         methods=['post', 'delete']
     )
     def subscribe(self, request, **kwargs):
@@ -196,7 +190,6 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        # permission_classes=[IsAuthenticated],
         methods=['get']
     )
     def get_subscriptions(self, request):
