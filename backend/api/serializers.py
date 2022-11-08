@@ -232,12 +232,14 @@ class RecipeListSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return request.user.is_authenticated and Shopping_cart.objects.filter(
-                user=request.user, recipe=obj).exists
+            user=request.user, recipe=obj).exists
 
     def get_is_in_favorite(self, obj):
         request = self.context.get('request')
-        return request.user.is_authenticated and Favorite.objects.filter(
-                user=request.user, recipe=obj).exists
+        return (
+               request.user.is_authenticated and Favorite.objects.filter
+               (user=request.user, recipe=obj).exists
+        )
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

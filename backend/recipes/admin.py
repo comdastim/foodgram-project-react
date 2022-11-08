@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (Ingredient, Recipe, RecipeIngredient, Tag)
 
 
-@admin.register(Tag) 
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'slug')
     search_fields = ('name', 'color', 'slug')
@@ -11,7 +11,7 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Ingredient) 
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
     search_fields = ('name',)

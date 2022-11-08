@@ -9,7 +9,7 @@ services:
       - ../backend/foodgram/.env
 
   backend:
-    build: .
+    image: daffna/backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -20,7 +20,7 @@ services:
       - ../backend/foodgram/.env
 
   frontend:
-    build: ../frontend
+    image: daffna/frontend
     volumes:
       - ../frontend/:/app/result_build/
 
