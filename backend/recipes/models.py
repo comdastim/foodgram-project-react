@@ -40,7 +40,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         'Ingredient', through='RecipeIngredient')
     tags = models.ManyToManyField('Tag', through='RecipeTag')
-    cooking_time = models.TimeField('Время приготовления')
+    cooking_time = models.IntegerField('Время приготовления')
 
     class Meta:
         ordering = ('-id',)

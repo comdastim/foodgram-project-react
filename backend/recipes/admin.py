@@ -1,4 +1,4 @@
-from .models import (Ingredient, Recipe, RecipeIngredient, Tag)
+from .models import (Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag)
 from django.contrib import admin
 
 
@@ -21,11 +21,13 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
 
+class RecipeTagInline(admin.TabularInline):
+    model = RecipeTag
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author')
-    search_fields = ('author', 'tag', 'ingredient')
+    search_fields = ('name','author', 'tag')
     list_filter = ('name',)
-    inlines = [RecipeIngredientInline]
+    inlines = [RecipeIngredientInline, RecipeTagInline]
     empty_value_display = '-пусто-'

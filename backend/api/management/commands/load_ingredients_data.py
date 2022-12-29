@@ -1,30 +1,23 @@
 import csv
-import os
-
-from django.conf import settings
+from pathlib import Path
+from foodgram.settings import BASE_DIR
 from django.core.management.base import BaseCommand
-from django.db.utils import IntegrityError
 from recipes.models import Ingredient
+from django.db.utils import IntegrityError
 
-DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
-
+PROJECT_DIR = Path(BASE_DIR).resolve().joinpath('data')
+FILE_TO_OPEN = PROJECT_DIR / "ingredients.csv"
 
 class Command(BaseCommand):
-    help = 'Loading ingredients from csv.'
-
-    def add_arguments(self, parser):
-        parser.add_argument('filename', default='ingredients.csv', type=str)
-
     def handle(self, *args, **options):
-        with open(
-            os.path.join(
-                DATA_ROOT, options['filename']), 'r', encoding='utf-8'
-        ) as f:
-            data = csv.load(f)
+        with open(FILE_TO_OPEN, 'r', encoding='utf-8') as f:
+            data = csv.DictReader(f)
             for ingredient in data:
                 try:
                     Ingredient.objects.create(
                         name=ingredient['name'],
-                        measurement_unit=ingredient['measurement_unit'])
+                        measurement_unit=ingredient['measurement_unit']
+                    )
                 except IntegrityError:
                     print('Ингридиент уже существует')
+
