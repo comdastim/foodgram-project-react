@@ -142,26 +142,26 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class IngredientAddSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField(min_value=1)
+# class IngredientAddSerializer(serializers.ModelSerializer):
+    # id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    # amount = serializers.IntegerField(min_value=1)
 
-    class Meta:
-        model = RecipeIngredient
-        fields = ('id', 'amount')
+    # class Meta:
+        # model = RecipeIngredient
+        # fields = ('id', 'amount')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     image = Base64ImageField(required=True)
     text = serializers.CharField(required=True)
-    ingredients = IngredientAddSerializer(read_only=True)
-    tags = TagSerializer(read_only=True, many=True)
     cooking_time = serializers.IntegerField(required=True)
+    ingredients = RecipeIngredientSerializer(source='recipeingredient_set', many=True)
+    tags=serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many = True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'text', 'ingredients',
+        fields = ('name', 'image', 'text', 'ingredients',
                   'tags', 'cooking_time')
 
     def recipe_ingredient_create(cls, recipe, ingredients):
@@ -214,47 +214,42 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
-    ingredients = IngredientAddSerializer(read_only=True)
-    is_in_favorited = serializers.SerializerMethodField(read_only=True)
+    tags = serializers.StringRelatedField(many=True, read_only=True)
+    ingredients = serializers.SerializerMethodField()
+    # tags = TagSerializer(many=True, read_only=True)
+    # ingredients = IngredientSerializer(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
         fields = ('id', 'author', 'name', 'image', 'text',
                   'ingredients', 'tags', 'cooking_time',
-                  'is_in_favorited', 'is_in_shopping_cart')
+                  'is_favorited', 'is_in_shopping_cart')
 
     def get_ingredients(self, obj):
         ingredients = RecipeIngredient.objects.filter(recipe=obj)
         return RecipeIngredientSerializer(ingredients, many=True).data
 
-    def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
-        return request.user.is_authenticated and Shopping_cart.objects.filter(
-            user=request.user, recipe=obj).exists
-
-    def get_is_in_favorite(self, obj):
+    def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (
-               request.user.is_authenticated and Favorite.objects.filter
-               (user=request.user, recipe=obj).exists
-        )
+               request.user.is_authenticated and Favorite.objects.filter(
+               user=request.user, recipe=obj).exists)
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        return (request.user.is_authenticated and Shopping_cart.objects.filter(
+            user=request.user, recipe=obj).exists)
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
 
-    class Meta:
-        model = Favorite
-        fields = ('user', 'recipe')
-
-
-class Shopping_cartSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+class Favorite_Shopping_cartSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField(source='recipe.name')
+    image = Base64ImageField(source='recipe.image')
+    cooking_time = serializers.ReadOnlyField(source='recipe.cooking_time')
 
     class Meta:
-        model = Shopping_cart
-        fields = ('user', 'recipe')
+        model = Recipe
+        fields = ('id', 'name', 'cooking_time') # 'image',
+        read_only_fields =  '__all__',
