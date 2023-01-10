@@ -8,6 +8,7 @@ from django.db.utils import IntegrityError
 PROJECT_DIR = Path(BASE_DIR).resolve().joinpath('data')
 FILE_TO_OPEN = PROJECT_DIR / "ingredients.csv"
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(FILE_TO_OPEN, 'r', encoding='utf-8') as f:
@@ -20,4 +21,3 @@ class Command(BaseCommand):
                     )
                 except IntegrityError:
                     print('Ингридиент уже существует')
-
