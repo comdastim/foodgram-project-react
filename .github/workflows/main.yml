@@ -25,7 +25,6 @@ jobs:
          
   build_and_push_backend_to_docker_hub: 
     name: Push backend Docker image to Docker Hub 
-    if: github.ref == 'refs/heads/master' 
     runs-on: ubuntu-latest 
     needs: tests 
     steps: 
@@ -41,7 +40,8 @@ jobs:
       - name: Push backend to Docker Hub 
         uses: docker/build-push-action@v2 
         with: 
-          context: backend/ 
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true 
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest 
   
@@ -70,7 +70,6 @@ jobs:
     runs-on: ubuntu-latest 
     needs: 
       - build_and_push_backend_to_docker_hub 
-      - build_and_push_frontend_to_docker_hub 
     steps: 
       - name: executing remote ssh commands to deploy 
         uses: appleboy/ssh-action@master 
@@ -81,12 +80,11 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker compose stop
-            sudo docker compose rm -f backend
-            sudo docker compose rm -f frontend
+            sudo docker compose rm backend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            rm .env
             touch .env
-            echo -n > .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
