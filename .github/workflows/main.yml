@@ -40,8 +40,7 @@ jobs:
       - name: Push backend to Docker Hub 
         uses: docker/build-push-action@v2 
         with: 
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: backend/ 
           push: true 
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest 
   
@@ -70,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest 
     needs: 
       - build_and_push_backend_to_docker_hub 
+      - build_and_push_frontend_to_docker_hub 
     steps: 
       - name: executing remote ssh commands to deploy 
         uses: appleboy/ssh-action@master 
@@ -81,10 +81,11 @@ jobs:
           script: |
             sudo docker compose stop
             sudo docker compose rm backend
+            sudo docker compose rm frontend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-            rm .env
             touch .env
+            # echo -n > .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
@@ -92,9 +93,9 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             sudo docker compose up -d
-            sudo docker-compose exec backend python manage.py migrate
-            sudo docker-compose exec backend python manage.py createsuperuser
-            sudo docker compose exec backend python manage.py collectstatic --no-input
+            # sudo docker-compose exec backend python manage.py migrate
+            # sudo docker-compose exec backend python manage.py createsuperuser
+            # sudo docker compose exec backend python manage.py collectstatic --no-input
  
   send_message: 
     runs-on: ubuntu-latest 
