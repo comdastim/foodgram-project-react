@@ -83,8 +83,8 @@ jobs:
             sudo docker compose stop
             sudo docker compose rm -f backend
             sudo docker compose rm -f frontend
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_back:latest
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_front:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             touch .env
             echo -n > .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
