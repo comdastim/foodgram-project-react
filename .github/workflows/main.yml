@@ -79,9 +79,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            compose* stop
-            compose* rm backend
-            compose* rm frontend
+            compose stop
+            compose rm backend
+            compose rm frontend
             pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             touch .env
@@ -92,10 +92,10 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            compose* up -d
-            compose* exec backend python manage.py migrate
-            compose* exec backend python manage.py createsuperuser
-            compose* exec backend python manage.py collectstatic --no-input
+            compose up -d
+            compose exec backend python manage.py migrate
+            compose exec backend python manage.py createsuperuser
+            compose exec backend python manage.py collectstatic --no-input
  
   send_message: 
     runs-on: ubuntu-latest 
