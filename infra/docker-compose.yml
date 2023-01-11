@@ -7,7 +7,6 @@ services:
       - /var/lib/postgresql/data/
     env_file:
       - ../backend/foodgram/.env
-
   backend:
     image: daffna/backend
     restart: always
@@ -18,19 +17,18 @@ services:
       - db
     env_file:
       - ../backend/foodgram/.env
-
   frontend:
     image: daffna/frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
       - backend
-
   nginx:
     image: nginx:1.21.3-alpine
     restart: always
     ports:
       - "80:80"
+      
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
