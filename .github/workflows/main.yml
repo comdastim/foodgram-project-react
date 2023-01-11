@@ -80,8 +80,8 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker-compose stop
-            sudo docker-compose rm -f backend
-            sudo docker-compose rm -f frontend
+            sudo docker-compose rm backend
+            sudo docker-compose rm frontend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             touch .env
