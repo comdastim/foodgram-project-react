@@ -1,9 +1,4 @@
 version: '20.10.21'
-
-volumes:
-  static_value:
-  media_value:
-
 services:
   db:
     image: postgres:13.0-alpine
@@ -11,6 +6,7 @@ services:
       - /var/lib/postgresql/data/
     env_file:
       - ../backend/foodgram/.env
+  
   backend:
     image: daffna/backend
     restart: always
@@ -20,20 +16,26 @@ services:
     depends_on:
       - db
     env_file:
-      - ../backend/foodgram/.env  
+      - ../backend/foodgram/.env
+  
   frontend:
     image: daffna/frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
-      - backend  
+      - backend
+  
   nginx:
     image: nginx:1.19.3
     ports:
-      - 80:80
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
-      - /docs/:/usr/share/nginx/html/api/docs/
+      - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/
       - media_value:/var/html/media/
+
+volumes:
+  static_value:
+  media_value:
