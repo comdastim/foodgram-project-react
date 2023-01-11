@@ -4,19 +4,24 @@ services:
     image: postgres:13.0-alpine
     volumes:
       - /var/lib/postgresql/data/
-    env_file:
-      - ./.env
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    # env_file:
+      # - ./.env
   
   backend:
     image: daffna/backend
     restart: always
+    ports:
+      -"8000:8000"
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
       - db
-    env_file:
-      - ./.env
+    # env_file:
+      # - ./.env
   
   frontend:
     image: daffna/frontend
