@@ -27,10 +27,8 @@ services:
   frontend:
     image: daffna/frontend
     volumes:
-      - ../frontend/:/app/result_build/
-    depends_on:
-      - backend
-  
+      - ../frontend/:/app/result_build/ 
+
   nginx:
     image: nginx:1.19.3
     ports:
