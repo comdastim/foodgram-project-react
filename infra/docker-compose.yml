@@ -5,8 +5,7 @@ services:
     volumes:
       - /var/lib/postgresql/data/
     env_file:
-      - ./.env
-
+      - ../backend/foodgram/.env
   backend:
     image: daffna/backend
     restart: always
@@ -18,8 +17,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env
-
+      - ../backend/foodgram/.env
   frontend:
     image: daffna/frontend
     volumes:
