@@ -5,6 +5,7 @@ from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             RecipeTag, Shopping_cart, Tag)
 from rest_framework import serializers
 from users.models import Subscription, User
+import sys
 
 
 class CustomUserSerializer(UserSerializer):
@@ -164,7 +165,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('name', 'image', 'text', 'ingredients',
                   'tags', 'cooking_time')
 
-    def recipe_ingredient_create(cls, recipe, ingredients):
+    def recipe_ingredient_create(self, recipe, ingredients):
         recipe_list = [RecipeIngredient(
             recipe=recipe,
             ingredients=get_object_or_404(Ingredient, id=ingredient['id']),
@@ -176,6 +177,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return RecipeListSerializer(value, context=self.context).data
 
     def create(self, validated_data):
+        print(validated_data, file=sys.stderr)
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(
@@ -216,8 +218,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeListSerializer(serializers.ModelSerializer):
     tags = serializers.StringRelatedField(many=True, read_only=True)
     ingredients = serializers.SerializerMethodField()
-    # tags = TagSerializer(many=True, read_only=True)
-    # ingredients = IngredientSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 

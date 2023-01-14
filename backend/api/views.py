@@ -40,6 +40,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeListSerializer
         return RecipeSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
     @staticmethod
     def change_favorite_or_shopping_cart(model, recipe, request):
         object = model.objects.filter(
