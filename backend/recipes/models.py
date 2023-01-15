@@ -1,6 +1,9 @@
 from colorfield.fields import ColorField
 from django.db import models
+from django.utils import timezone
 from users.models import User
+
+now = timezone.localtime(timezone.now())
 
 
 class Tag(models.Model):
