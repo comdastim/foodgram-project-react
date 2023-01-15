@@ -40,9 +40,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeListSerializer
         return RecipeSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
     @staticmethod
     def change_favorite_or_shopping_cart(model, recipe, request):
         object = model.objects.filter(
@@ -56,9 +53,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                recipe=recipe)
             serializer_to_use = Favorite_Shopping_cartSerializer(object_to_add, data=request.data)
             serializer_to_use.save()
-            # model.objects.create(user=request.user, recipe=recipe)
-            # serializer = Favorite_Shopping_cartSerializer(recipe)
-            # serializer.save()
+            model.objects.create(user=request.user, recipe=recipe)
+            serializer = Favorite_Shopping_cartSerializer(recipe)
+            serializer.save()
             return Response({'Объект успешно добавлен'},
                 status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
@@ -72,8 +69,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         methods=['POST', 'DELETE'],
         detail=True,
+        url_path='favorite'
     )
-    def change_favorite(self, request, pk):
+    def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         return self.change_favorite_or_shopping_cart(
             Favorite, recipe=recipe, request=request)
@@ -82,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['POST', 'DELETE'],
         detail=True,
     )
-    def change_shopping_cart(self, request, pk):
+    def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         return self.change_favorite_or_shopping_cart(
             Shopping_cart, recipe=recipe, request=request)
@@ -199,3 +197,5 @@ class CustomUserViewSet(UserViewSet):
             authors, many=True
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
