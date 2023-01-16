@@ -27,31 +27,37 @@ pip install -r requirements.txt
 
 ### Запуск через Docker
 
-Для работы приложения требуется установка на ваш компьютер Python, Docker, PostgreSQL.
+Для работы приложения требуется установка на ваш компьютер Python, Docker, PostgreSQL
 
 Склонировать репозиторий:
 
-git clone git@github.com:comdastim/infra_sp2.git
+git clone git@github.com:comdastim/foodgram-project-react.git
 
 Запустить docker-compose:
 
-docker-compose up -d
+docker-compose up -d --build
 
 Выполнить миграции:
-
-docker-compose exec web python manage.py migrate —noinput
+! соблюдайте порядок выполнения миграций:    
+docker-compose exec backend python manage.py makemigrations users
+docker-compose exec backend python manage.py migrate users
+docker-compose exec backend python manage.py makemigrations recipes
+docker-compose exec backend python manage.py migrate recipes
+docker-compose exec backend python manage.py makemigrations
+docker-compose exec backend python manage.py migrate
 
 Выполнить сбор статических файлов:
 
 docker-compose exec web python manage.py collectstatic —no-input
 
+Произвести загрузку данных:
+
+docker-compose exec backend python manage.py load_ingredients_data
+
 Создать суперпользователя:
 
 docker-compose exec web python manage.py createsuperuser
 
-Скачать образ из репозитория на DockerHub:
-
-docker pull daffna/infra
 
 
 ### Техническое описание проекта:
