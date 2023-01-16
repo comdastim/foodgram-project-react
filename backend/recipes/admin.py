@@ -1,5 +1,8 @@
-from .models import (Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag)
 from django.contrib import admin
+
+
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, RecipeTag,
+                     Shopping_cart, Tag)
 
 
 @admin.register(Tag)
@@ -8,6 +11,11 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ('name', 'color', 'slug')
     list_filter = ('name', 'color', 'slug',)
     empty_value_display = '-пусто-'
+
+
+admin.site.register(Favorite)
+
+admin.site.register(Shopping_cart)
 
 
 @admin.register(Ingredient)

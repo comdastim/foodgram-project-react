@@ -1,9 +1,6 @@
 from colorfield.fields import ColorField
 from django.db import models
-from django.utils import timezone
 from users.models import User
-
-now = timezone.localtime(timezone.now())
 
 
 class Tag(models.Model):
@@ -55,8 +52,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_amount')
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredients_amount')
     amount = models.IntegerField('Количество')
 
     class Meta:
@@ -76,19 +73,46 @@ class RecipeTag(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='favorite')
-    recipe = models.ManyToManyField('Recipe', related_name='favorite')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorite')
 
     class Meta:
         verbose_name = 'Понравившийся рецепт'
         verbose_name_plural = 'Понравившиеся рецепты'
 
+    def __str__(self):
+        return f'{self.user} {self.recipe}'
+
 
 class Shopping_cart(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='shopping_cart')
-    recipe = models.ManyToManyField('Recipe', related_name='shopping_cart')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='shopping_cart')
 
     class Meta:
-        verbose_name = 'Список покупок'
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+
+    def __str__(self):
+        return f'{self.user} {self.recipe}'
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='follower', verbose_name='Подписчик')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='following', verbose_name='Автор'
+    )
+
+    class Meta:
+        ordering = ('-id', )
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='unique_follow')]
+
+    def _str_(self):
+        return f'{self.user}{self.following}'

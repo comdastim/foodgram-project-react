@@ -12,11 +12,16 @@ router.register('ingredients', IngredientViewSet, basename='ingredients')
 router.register('users', CustomUserViewSet, basename='users')
 router.register('recipes', RecipeViewSet, basename='recipes')
 
-subscriptions = CustomUserViewSet.as_view({'get': 'subscriptions', })
+subscriptions = CustomUserViewSet.as_view({'post': 'subscriptions',
+                                           'delete': 'subscriptions',
+                                           'get': 'subscriptions'})
+favorite = RecipeViewSet.as_view({'post': 'favorite', 'delete': 'favorite'})
+shopping_cart = RecipeViewSet.as_view({'post': 'shopping_cart',
+                                       'delete': 'shopping_cart',
+                                       'get': 'shopping_cart'})
 
 urlpatterns = (
-    path('users/subscriptions/', subscriptions, name='subscriptions'),
-    # path('', include('djoser.urls')),
+    path('users/<int:user_id>/subscribe/', CustomUserViewSet.as_view),
     path('', include(router.urls)),
     path('auth/', include('djoser.urls.authtoken')),
 )
