@@ -163,8 +163,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             user=request.user, recipe=obj).exists())
 
 
-# сериализаторы для чтения рецепта
-
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.CharField(source='ingredient.name', read_only=True)
