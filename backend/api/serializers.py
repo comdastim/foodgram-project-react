@@ -181,6 +181,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    tags = TagSerializer(read_only=True, many = True)
 
     class Meta:
         model = Recipe
@@ -217,8 +218,7 @@ class RecipeSubscriptionSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "image", "cooking_time")
 
 
-class SubscriptionListSerializer(CustomUserSerializer):
-
+class SubscriptionCreateSerializer(CustomUserSerializer):
     recipes = RecipeSubscriptionSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
@@ -237,3 +237,31 @@ class SubscriptionListSerializer(CustomUserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+
+class SubscriptionGetSerializer(CustomUserSerializer):
+    id = serializers.ReadOnlyField(source='author.id')
+    email = serializers.ReadOnlyField(source='author.email')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.ReadOnlyField(source='author.recipes.count')
+
+    class Meta:
+        model = Subscription
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_is_subscribed(self, obj):
+        return Subscription.objects.filter(
+            user=obj.user, author=obj.author
+        ).exists()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return RecipeSubscriptionSerializer(queryset, many=True).data

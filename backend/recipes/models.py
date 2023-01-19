@@ -21,8 +21,8 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField('Единицы измерения', max_length=200)
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -57,8 +57,8 @@ class RecipeIngredient(models.Model):
     amount = models.IntegerField('Количество')
 
     class Meta:
-        verbose_name = 'Количество ингридиента'
-        verbose_name_plural = 'Количество ингридиентов'
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
         return f'{self.recipe}{self.ingredient}'
