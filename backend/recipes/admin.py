@@ -36,8 +36,13 @@ class RecipeTagInline(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author')
+    list_display = ('id', 'name', 'author','favorite')
+    readonly_fields = ('favorite',)
     search_fields = ('name', 'author', 'tag')
     list_filter = ('name',)
     inlines = [RecipeIngredientInline, RecipeTagInline]
     empty_value_display = '-пусто-'
+
+    @admin.display(description='В избранном')
+    def favorite(self, obj):
+        return obj.favorite_recipe.count()
