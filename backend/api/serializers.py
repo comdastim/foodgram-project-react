@@ -1,5 +1,4 @@
 import base64
-
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -181,7 +180,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
-    tags = TagSerializer(read_only=True, many = True)
+    tags = TagSerializer(read_only=True, many=True)
 
     class Meta:
         model = Recipe
@@ -237,6 +236,7 @@ class SubscriptionCreateSerializer(CustomUserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+
 
 class SubscriptionGetSerializer(CustomUserSerializer):
     id = serializers.ReadOnlyField(source='author.id')

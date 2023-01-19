@@ -11,7 +11,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Shopping_cart, Subscription, Tag
-from rest_framework import filters
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -28,8 +27,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['POST','DELETE'],
-        # url_path='subscriptions'
+        methods=['POST', 'DELETE'],
     )
     def subscribe(self, request, **kwargs):
         user = request.user
@@ -102,8 +100,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
-    # filter_backends = [filters.SearchFilter]
-    # search_fields = ['^name']
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
