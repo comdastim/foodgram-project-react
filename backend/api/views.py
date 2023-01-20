@@ -1,22 +1,16 @@
 from api.filters import IngredientFilter, RecipeFilter
 from api.serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                              Favorite_Shopping_cartSerializer,
-                             IngredientSerializer, TagSerializer,
-                             RecipeListSerializer, RecipeSerializer,
-                             SubscriptionGetSerializer,
-                             SubscriptionCreateSerializer,)
+                             IngredientSerializer, RecipeListSerializer,
+                             RecipeSerializer, SubscriptionCreateSerializer,
+                             SubscriptionGetSerializer, TagSerializer)
 from django.db.models import Sum
-from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Favorite,
-                            Ingredient,
-                            Recipe,
-                            RecipeIngredient,
-                            Shopping_cart,
-                            Subscription,
-                            Tag)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            Shopping_cart, Subscription, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
