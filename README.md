@@ -1,5 +1,7 @@
 # praktikum_new_diplom
 
+ ссылка на сайт http://51.250.30.47/recipes
+
 ### Описание:
 
 
