@@ -77,7 +77,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=False,
         methods=['GET'],
-        # url_path='subscriptions'
     )
     def subscriptions(self, request):
         user = request.user
