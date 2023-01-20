@@ -52,8 +52,12 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_amount')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredients_amount')
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='recipe_amount'
+        )
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, related_name='ingredients_amount'
+        )
     amount = models.IntegerField('Количество')
 
     class Meta:
@@ -74,8 +78,11 @@ class RecipeTag(models.Model):
 
 class Favorite(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='favorite')
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorite')
+        User, on_delete=models.CASCADE, related_name='favorite'
+        )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='favorite'
+        )
 
     class Meta:
         verbose_name = 'Понравившийся рецепт'
@@ -88,7 +95,9 @@ class Favorite(models.Model):
 class Shopping_cart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='shopping_cart')
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='shopping_cart')
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='shopping_cart'
+        )
 
     class Meta:
         verbose_name = 'Покупка'

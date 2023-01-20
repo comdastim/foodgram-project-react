@@ -10,7 +10,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Shopping_cart, Subscription, Tag
+from recipes.models import (Favorite,
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            Shopping_cart,
+                            Subscription,
+                            Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -120,7 +126,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if object.exists():
                 return Response({'errors': 'Объект был добавлен ранее'},
-                    status=status.HTTP_400_BAD_REQUEST)
+                                status=status.HTTP_400_BAD_REQUEST)
             model.objects.create(user=request.user, recipe=recipe)
             serializer = Favorite_Shopping_cartSerializer(recipe)
             return Response(serializer.data, status.HTTP_201_CREATED)
@@ -128,9 +134,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if object.exists():
                 object.delete()
                 return Response({'Объект успешно удален'},
-                   status=status.HTTP_204_NO_CONTENT)
+                                status=status.HTTP_204_NO_CONTENT)
             return Response({'Объект не существует'},
-                 status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         methods=['POST', 'DELETE'],
@@ -162,7 +168,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         ingredients = RecipeIngredient.objects.filter(
             recipe__shopping_cart__user=request.user).values(
-                'ingredient__name', 'ingredient__measurement_unit').annotate(amount=Sum('amount'))
+                'ingredient__name', 'ingredient__measurement_unit').annotate(
+                    amount=Sum('amount'))
         shopping_list = '\n'.join([
             f'{ingredient["ingredient__name"]} - {ingredient["amount"]} '
             f'{ingredient["ingredient__measurement_unit"]}'

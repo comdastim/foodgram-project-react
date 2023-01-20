@@ -1,10 +1,15 @@
 import base64
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Shopping_cart, Subscription, Tag
+from recipes.models import (Favorite,
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            Shopping_cart,
+                            Subscription,
+                            Tag)
 
 from users.models import User
 
@@ -26,8 +31,10 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return user.is_authenticated and user != obj and Subscription.objects.filter(
-            user=user, author=obj).exists()
+        return (user.is_authenticated
+                and user != obj
+                and Subscription.objects.filter(
+                    user=user, author=obj).exists())
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -101,7 +108,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
     ingredients = IngredientAddSerializer(many=True)
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True)
 
     class Meta:
         model = Recipe
